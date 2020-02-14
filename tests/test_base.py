@@ -116,16 +116,55 @@ class TestBase(unittest.TestCase):
             updated.second,
             updated.microsecond
         )
-
-        self.assertEqual(
-            dictionary['created_at'],
-            test_created,
-        )
-        self.assertEqual(
-            dictionary['updated_at'],
-            test_updated,
-        )
         self.assertEquals(dictionary['__class__'], "BaseModel")
+
+    def test_create_BaseModel_from_dictionary(self):
+        model = BaseModel()
+        dictionary = model.to_dict()
+
+        try:
+            model_copy = BaseModel(dictionary)
+        except TypeError:
+            self.fail("Arguments are not implemented")
+
+        self.assertEqual(model.id, model_copy.id)
+        self.assertEqual(model.created_at, model_copy.created_at)
+        self.assertEqual(model.updated_at, model_copy.updated_at)
+        self.assertIsNot(model, model_copy)
+
+        model.save()
+        dictionary = model.to_dict()
+
+        self.assertEqual(model.id, model_copy.id)
+        self.assertEqual(model.created_at, model_copy.created_at)
+        self.assertIsNotEqual(model.updated_at, model_copy.updated_at)
+        self.assertIsNot(model, model_copy)
+
+        model_copy = BaseModel(dictionary)
+
+        self.assertEqual(model.id, model_copy.id)
+        self.assertEqual(model.created_at, model_copy.created_at)
+        self.assertEqual(model.updated_at, model_copy.updated_at)
+        self.assertIsNot(model, model_copy)
+
+        dictionary['name'] = 'Jaime'
+        dictionary['age'] = 21
+        dictionary['gender'] = 'male videogamer'
+        dictionary['strength'] = 121.5
+
+        model_copy = BaseModel(dictionary)
+        try:
+            name = model_copy.name
+            age = model_copy.age
+            gender = model_copy.gender
+            strength = model_copy.strength
+        except AttributeError as err:
+            self.fail(err.args)
+
+        self.assertEqual(name, dictionary['name'])
+        self.assertEqual(age, dictionary['age'])
+        self.assertEqual(gender, dictionary['gender'])
+        self.assertEqual(strength, dictionary['strength'])
 
 
 if __name__ == '__main__':
