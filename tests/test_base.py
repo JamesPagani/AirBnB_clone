@@ -50,18 +50,6 @@ class TestBase(unittest.TestCase):
             datetime.datetime,
             "updated_at is not an intance of datetime")
 
-    def test_str_function(self):
-        model = BaseModel()
-        test = "[BaseModel] ({:s}) ({})".format(model.id, model.__dict__)
-        self.assertEqual(
-            test,
-            model.__str__(),
-            "BasSeModel.__str__: {:s}, \nMUST BE:\n{:s}".format(
-                model.__str__(),
-                test
-                )
-        )
-
     def test_save_function(self):
         model = BaseModel()
         created = model.created_at
@@ -90,32 +78,11 @@ class TestBase(unittest.TestCase):
 
     def test_to_dict_function(self):
         model = BaseModel()
-        created = model.created_at
-        updated = model.updated_at
 
         try:
             dictionary = model.to_dict()
         except AttributeError:
             self.fail("to_dict method is not implemented")
-
-        test_created = "{:d}-{:d}-{:d}T{:d}:{:d}.{:f}".format(
-            created.year,
-            created.month,
-            created.day,
-            created.hour,
-            created.minute,
-            created.second,
-            created.microsecond
-        )
-        test_updated = "{:d}-{:d}-{:d}T{:d}:{:d}.{:f}".format(
-            updated.year,
-            updated.month,
-            updated.day,
-            updated.hour,
-            updated.minute,
-            updated.second,
-            updated.microsecond
-        )
         self.assertEquals(dictionary['__class__'], "BaseModel")
 
     def test_create_BaseModel_from_dictionary(self):
@@ -123,7 +90,7 @@ class TestBase(unittest.TestCase):
         dictionary = model.to_dict()
 
         try:
-            model_copy = BaseModel(dictionary)
+            model_copy = BaseModel(**dictionary)
         except TypeError:
             self.fail("Arguments are not implemented")
 
@@ -140,7 +107,7 @@ class TestBase(unittest.TestCase):
         self.assertIsNotEqual(model.updated_at, model_copy.updated_at)
         self.assertIsNot(model, model_copy)
 
-        model_copy = BaseModel(dictionary)
+        model_copy = BaseModel(**dictionary)
 
         self.assertEqual(model.id, model_copy.id)
         self.assertEqual(model.created_at, model_copy.created_at)
@@ -152,7 +119,7 @@ class TestBase(unittest.TestCase):
         dictionary['gender'] = 'male videogamer'
         dictionary['strength'] = 121.5
 
-        model_copy = BaseModel(dictionary)
+        model_copy = BaseModel(**dictionary)
         try:
             name = model_copy.name
             age = model_copy.age
