@@ -12,25 +12,15 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """Initialize a new class object."""
-        if kwargs is not None:
+        if kwargs:
             self.__dict__.update(kwargs)
             if "created_at" in self.__dict__:
-                self.created_at = self.created_at.split(sep="T")
-                self.created_at.extend(self.created_at.pop(0).split(sep="-"))
-                self.created_at.extend(self.created_at.pop(0).split(sep=":"))
-                self.created_at.extend(self.created_at.pop().split(sep="."))
-                for i in range(len(self.created_at)):
-                    self.created_at[i] = int(self.created_at[i])
-                self.created_at = datetime(*self.created_at)
+                self.created_at = self.to_datetime(self.created_at)
 
             if "updated_at" in self.__dict__:
-                self.updated_at = self.updated_at.split(sep="T")
-                self.updated_at.extend(self.created_at.pop(0).split(sep="-"))
-                self.updated_at.extend(self.created_at.pop(0).split(sep=":"))
-                self.updated_at.extend(self.created_at.pop().split(sep="."))
-                for i in range(len(self.updated_at)):
-                    self.updated_at[i] = int(self.updated_at)
-                self.updated_at = datetime(*self.updated_at)
+                self.updated_at = self.to_datetime(self.updated_at)
+            if "__class__" in self.__dict__:
+                del self.__dict__["__class__"]
         else:
             self.id = str(uuid4())
             self.created_at = datetime.now()
@@ -52,3 +42,15 @@ class BaseModel:
         new_dict["created_at"] = self.created_at.isoformat()
         new_dict["updated_at"] = self.updated_at.isoformat()
         return new_dict
+
+
+    @staticmethod
+    def to_datetime(iso_datetime):
+        """From ISO string datetime to datetime.datetime."""
+        list_datetime = iso_datetime.split(sep="T")
+        list_datetime.extend(list_datetime.pop(0).split(sep="-"))
+        list_datetime.extend(list_datetime.pop(0).split(sep=":"))
+        list_datetime.extend(list_datetime.pop().split(sep="."))
+        for i in range(len(list_datetime)):
+            list_datetime[i] = int(list_datetime[i])
+        return datetime(*list_datetime)
