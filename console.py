@@ -4,11 +4,19 @@
 """This module contains the console application of the AirBnB web"""
 import cmd
 import sys
+from models.base_model import BaseModel
+import models
 
 
 class HBNBCommand(cmd.Cmd):
     """This is the console class"""
     prompt = '(hbnb) '
+
+    def __init__(self):
+        super().__init__()
+        self.__classes = {
+            'BaseModel': BaseModel
+            }
 
     def do_EOF(self, line):
         'exit the program'
@@ -30,7 +38,17 @@ class HBNBCommand(cmd.Cmd):
             $ create <Class name>
             ex: $ create BaseModel
         """
-        pass
+        cmd = self.__parseline_generator(arg)
+        try:
+            className = next(cmd)
+            if className in self.__classes:
+                instance = self.__classes[className]()
+                models.storage.save()
+                print(instance.id)
+            else:
+                print("** class doesn't exist **")
+        except StopIteration:
+            print("** class name missing **")
 
     def do_show(self, arg):
         """
@@ -44,7 +62,30 @@ class HBNBCommand(cmd.Cmd):
             $ show <Class name> <id>
             ex: $ show BaseModel 1234-1234-1234
         """
-        pass
+        cmd = self.__parseline_generator(arg)
+        try:
+            class_name = next(cmd)
+            if class_name not in self.__classes:
+                print("** class doesn't exist **")
+                return
+        except StopIteration:
+            print('** class name missing **')
+            return
+
+        try:
+            id = next(cmd)
+        except StopIteration:
+            print('** instance id missing **')
+            return
+
+        objects = models.storage.all()
+        key = "{}.{}".format(class_name, id)
+        if key in objects:
+            instance = self.__classes[class_name](objects[key])
+            print(instance)
+        else:
+            print('** no instance found **')
+            return
 
     def do_destroy(self, arg):
         """
@@ -99,6 +140,16 @@ class HBNBCommand(cmd.Cmd):
 
     def emptyline(self):
         pass
+
+    def __parseline_generator(self, line):
+        """It parse the commands but as a generator"""
+        split = line.split()
+        for i in split:
+            yield i
+
+    def __parseline(self, line):
+        """It parse the commands an return as a list"""
+        return line.split()
 
 
 if __name__ == '__main__':
