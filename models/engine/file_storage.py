@@ -2,15 +2,15 @@
 # Author: Jhonatan Arenas <1164@holbertonschool.com>
 # models/engine/file_storage.py
 """This module contains the engine of persistence"""
-from base_model import BaseModel
 import json
+from models.base_model import BaseModel
 
 
 class FileStorage():
     """FileStorage contains the engines to persist the data"""
 
     def __init__(self):
-        self.__file_path = './file.json'
+        self.__file_path = 'file.json'
         self.__objects = dict()
 
     def all(self):
@@ -25,7 +25,7 @@ class FileStorage():
         """
         if obj:
             value = obj.to_dict()
-            key = "{}.{}".format(value['__class'], value['id'])
+            key = "{}.{}".format(value['__class__'], value['id'])
             self.__objects[key] = value
 
     def save(self):

@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+# Author: Jaime Gálvez(JamesPagani) <ur email bruh>
+# Collaborator: Jhonatan Arenas (Cybernuki) <1164@holbertonschool.com>
+# models/base_model.py
 """Base Model.
 Main template for all other classes inside this project.
 """
@@ -6,6 +9,8 @@ Main template for all other classes inside this project.
 
 from datetime import datetime
 from uuid import uuid4
+import models
+
 
 class BaseModel:
     """Template for all other classes."""
@@ -27,6 +32,7 @@ class BaseModel:
             self.id = str(uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
+            models.storage.new(self)
 
     def __str__(self):
         """String representation of the object."""
@@ -36,6 +42,8 @@ class BaseModel:
     def save(self):
         """Update 'updated_at' attribute."""
         self.created_at = datetime.now()
+        models.storage.new(self)
+        models.storage.save()
 
     def to_dict(self):
         """Return a dictionary representation of the object."""
