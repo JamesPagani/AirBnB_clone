@@ -81,7 +81,7 @@ class HBNBCommand(cmd.Cmd):
         objects = models.storage.all()
         key = "{}.{}".format(class_name, id)
         if key in objects:
-            instance = self.__classes[class_name](objects[key])
+            instance = self.__classes[class_name](**objects[key])
             print(instance)
         else:
             print('** no instance found **')
@@ -114,7 +114,21 @@ class HBNBCommand(cmd.Cmd):
             ---------or---------
             $ all
         """
-        pass
+        try:
+            cmd = self.__parseline_generator(arg)
+            class_name = next(cmd)
+            if class_name in self.__classes:
+                print(models.storage.list_instances_by_classname(class_name))
+            else:
+                print("** class doesn't exist **")
+        except StopIteration:
+            list_values = [v for v in models.storage.all().values()]
+            list_instance = []
+            for dicts in list_values:
+                class_name = dicts['__class__']
+                instance_str = self.__classes[class_name](**dicts).__str__()
+                list_instance.append(instance_str)
+            print(list_instance)
 
     def do_update(self, arg):
         """

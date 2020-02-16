@@ -45,3 +45,10 @@ class FileStorage():
                 self.__objects = json.load(file)
         except Exception:
             pass
+
+    def list_instances_by_classname(self, class_name):
+        return_list = []
+        for k in self.__objects:
+            if class_name in k:
+                return_list.append(self.__objects[k])
+        return return_list
