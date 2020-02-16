@@ -81,7 +81,7 @@ class HBNBCommand(cmd.Cmd):
         objects = storage.all()
         key = "{}.{}".format(class_name, id)
         if key in objects:
-            instance = self.__classes[class_name](**objects[key])
+            instance = objects[key]
             print(instance)
         else:
             print('** no instance found **')
@@ -139,13 +139,11 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
         else:
             str_list = []
-            for dictionary in storage.all().values():
-                class_v = self.__classes[dictionary['__class__']]
-                instance = class_v(**dictionary)
-                if class_name and instance.__class__.__name__ == class_name:
-                    str_list.append(instance.__str__())
+            for obj in storage.all().values():
+                if class_name and obj.__class__.__name__ == class_name:
+                    str_list.append(obj.__str__())
                 elif not class_name:
-                    str_list.append(instance.__str__())
+                    str_list.append(obj.__str__())
             print(str_list)
 
     def do_update(self, arg):
@@ -194,20 +192,21 @@ class HBNBCommand(cmd.Cmd):
         attr_v = self.__check_args(self.__cmd, "** value missing **")
         if not attr_v:
             return
+        if "\"" in attr_v:
+            attr_v = self.__quote_handler(attr_v)
+        if not attr_v:
+            return
 
         # Updating instance:
         forbbiden_attr = ["id", "created_at", "updated_at"]
-        dictionary = objects[key]
+        instance = objects[key]
 
         if attr_k not in forbbiden_attr:
             try:
-                type_v = type(dictionary[attr_k])
-                dictionary[attr_k] = type_v(attr_v)
+                type_v = type(getattr(instance, attr_k))
+                setattr(instance, attr_k, type_v(attr_v))
             except Exception:
-                dictionary[attr_k] = attr_v
-
-            instance = self.__classes[class_name](**dictionary)
-            storage.new(instance)
+                setattr(instance, attr_k, self.__data_converter(attr_v))
             storage.save()
 
     def __parseline_generator(self, line):
@@ -267,6 +266,38 @@ class HBNBCommand(cmd.Cmd):
         except StopIteration:
             if err_message:
                 print(err_message)
+            return None
+
+    def __quote_handler(self, attr):
+        """
+        This method parse the strings with quotes in order to
+        use the update command without errors and recieving the
+        quotes strings with spaces
+
+        Args:
+            attr (string): is the attribute_value where the parsing would
+                            be saved
+        Return:
+            A (string) without quoutes.
+            Also, it returns None if the string has no end quote and print
+            the error
+        """
+        if ("\"" in attr[0]
+                and "\"" in attr[len(attr) - 1]):
+            return attr[1:-1]
+        quote_list = []
+        while attr:
+            quote_list.append(attr)
+            attr = self.__check_args(self.__cmd, None)
+        if "\"" in quote_list[len(quote_list) - 1][-1:]:
+            quote_str = quote_list[0][1:] + " "
+            if (len(quote_list) > 2):
+                quote_str += " ".join(quote_list[1:-1])
+                quote_str += " "
+            quote_str += quote_list[len(quote_list) - 1][:-1]
+            return quote_str
+        else:
+            print("** value Error: No closing quotation **")
             return None
 
     def postloop(self):
