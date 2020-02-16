@@ -9,12 +9,16 @@ from models.base_model import BaseModel
 class FileStorage():
     """FileStorage contains the engines to persist the data"""
 
+    __instances = 1
+
     def __init__(self):
         """
         Init method of thf FileStorage
         """
-        self.__file_path = 'file.json'
-        self.__objects = dict()
+        if FileStorage.__instances:
+            self.__file_path = 'file.json'
+            self.__objects = dict()
+            FileStorage.__instances -= 1
 
     def all(self):
         """
@@ -27,16 +31,17 @@ class FileStorage():
         Set in in the __objects attribute the obj with key: <obj class name>.id
         """
         if obj:
-            value = obj.to_dict()
-            key = "{}.{}".format(value['__class__'], value['id'])
-            self.__objects[key] = value
+            key = "{}.{}".format(obj.__class__.__name__, obj.id)
+            self.__objects[key] = obj
 
     def save(self):
         """
         Serializes __objects to the JSON file (path: __file_path)
         """
+        objects_copy = self.__objects
+        json_dict = {key: objects_copy[key].to_dict() for key in objects_copy}
         with open(self.__file_path, "w", encoding="utf-8") as file:
-            json.dump(self.__objects, file, ensure_ascii=False)
+            json.dump(json_dict, file, ensure_ascii=False)
 
     def reload(self):
         """
@@ -45,25 +50,10 @@ class FileStorage():
         """
         try:
             with open(self.__file_path, "r", encoding="utf-8") as file:
-                self.__objects = json.load(file)
+                load = json.load(file)
+                for obj in load.values():
+                    class_name = obj['__class__']
+                    instance = eval(class_name)(**obj)
+                    self.new(instance)
         except Exception:
             pass
-
-    def list_by_class(self, class_name, class_var):
-        """
-        this method do a search for all keys that contains the given class_name
-
-        Args:
-            class_name (str):Is the name of the instances' class to be searched
-            class_var (Class): Is the class, is used to instance a copy
-        Return:
-            list (list) of the __str__ representation of the founded instances
-            It is an empty list if it did not found instances of the given
-            class_name
-        """
-        return_list = []
-        for k in self.__objects:
-            if class_name in k:
-                instance = class_var(**self.__objects[k]).__str__()
-                return_list.append(instance)
-        return return_list
