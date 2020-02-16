@@ -10,6 +10,9 @@ class FileStorage():
     """FileStorage contains the engines to persist the data"""
 
     def __init__(self):
+        """
+        Init method of thf FileStorage
+        """
         self.__file_path = 'file.json'
         self.__objects = dict()
 
@@ -46,9 +49,21 @@ class FileStorage():
         except Exception:
             pass
 
-    def list_instances_by_classname(self, class_name):
+    def list_by_class(self, class_name, class_var):
+        """
+        this method do a search for all keys that contains the given class_name
+
+        Args:
+            class_name (str):Is the name of the instances' class to be searched
+            class_var (Class): Is the class, is used to instance a copy
+        Return:
+            list (list) of the __str__ representation of the founded instances
+            It is an empty list if it did not found instances of the given
+            class_name
+        """
         return_list = []
         for k in self.__objects:
             if class_name in k:
-                return_list.append(self.__objects[k])
+                instance = class_var(**self.__objects[k]).__str__()
+                return_list.append(instance)
         return return_list
