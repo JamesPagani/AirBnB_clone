@@ -17,6 +17,7 @@ class HBNBCommand(cmd.Cmd):
         self.__classes = {
             'BaseModel': BaseModel
             }
+        self.__cmd = ""
 
     def do_EOF(self, line):
         'exit the program'
@@ -38,17 +39,16 @@ class HBNBCommand(cmd.Cmd):
             $ create <Class name>
             ex: $ create BaseModel
         """
-        cmd = self.__parseline_generator(arg)
-        try:
-            className = next(cmd)
-            if className in self.__classes:
-                instance = self.__classes[className]()
-                storage.save()
-                print(instance.id)
-            else:
-                print("** class doesn't exist **")
-        except StopIteration:
-            print("** class name missing **")
+        className = self.__check_args(
+            self.__cmd,
+            "** class name missing **")
+
+        if className and className in self.__classes:
+            instance = self.__classes[className]()
+            storage.save()
+            print(instance.id)
+        else:
+            print("** class doesn't exist **")
 
     def do_show(self, arg):
         """
@@ -62,22 +62,20 @@ class HBNBCommand(cmd.Cmd):
             $ show <Class name> <id>
             ex: $ show BaseModel 1234-1234-1234
         """
-        cmd = self.__parseline_generator(arg)
-        try:
-            class_name = next(cmd)
-            if class_name not in self.__classes:
-                print("** class doesn't exist **")
-                return
-        except StopIteration:
-            print('** class name missing **')
+        # Handle class_name argument:
+        class_name = self.__check_args(self.__cmd, "** class name missing **")
+        if not class_name:
+            return
+        if class_name and class_name not in self.__classes:
+            print("** class doesn't exist **")
             return
 
-        try:
-            id = next(cmd)
-        except StopIteration:
-            print('** instance id missing **')
+        # Handel id argument:
+        id = self.__check_args(self.__cmd, "** instance id missing **")
+        if not id:
             return
 
+        # Print instances
         objects = storage.all()
         key = "{}.{}".format(class_name, id)
         if key in objects:
@@ -85,7 +83,6 @@ class HBNBCommand(cmd.Cmd):
             print(instance)
         else:
             print('** no instance found **')
-            return
 
     def do_destroy(self, arg):
         """
@@ -99,22 +96,20 @@ class HBNBCommand(cmd.Cmd):
             $ destroy <Class name> <id>
             ex: $ destroy BaseModel 1234-1234-1234
         """
-        cmd = self.__parseline_generator(arg)
-        try:
-            class_name = next(cmd)
-            if class_name not in self.__classes:
-                print("** class doesn't exist **")
-                return
-        except StopIteration:
-            print('** class name missing **')
+        # Handle class_name argument:
+        class_name = self.__check_args(self.__cmd, "** class name missing **")
+        if not class_name:
+            return
+        if class_name not in self.__classes:
+            print("** class doesn't exist **")
             return
 
-        try:
-            id = next(cmd)
-        except StopIteration:
-            print('** instance id missing **')
+        # Handle id argument:
+        id = self.__check_args(self.__cmd, "** instance id missing **")
+        if not id:
             return
 
+        # Destroy object
         objects = storage.all()
         key = "{}.{}".format(class_name, id)
         if key in objects:
@@ -122,7 +117,6 @@ class HBNBCommand(cmd.Cmd):
             storage.save()
         else:
             print('** no instance found **')
-            return
 
     def do_all(self, arg):
         """
@@ -137,14 +131,9 @@ class HBNBCommand(cmd.Cmd):
             ---------or---------
             $ all
         """
-        try:
-            cmd = self.__parseline_generator(arg)
-            class_name = next(cmd)
-            if class_name in self.__classes:
-                print(storage.list_instances_by_classname(class_name))
-            else:
-                print("** class doesn't exist **")
-        except StopIteration:
+        # Handle class_name argument:
+        class_name = self.__check_args(self.__cmd, None)
+        if not class_name:
             list_values = [v for v in storage.all().values()]
             list_instance = []
             for dicts in list_values:
@@ -152,6 +141,11 @@ class HBNBCommand(cmd.Cmd):
                 instance_str = self.__classes[class_name](**dicts).__str__()
                 list_instance.append(instance_str)
             print(list_instance)
+        elif class_name in self.__classes:
+            print(storage.list_by_class(
+                class_name, self.__classes[class_name]))
+        else:
+            print("")
 
     def do_update(self, arg):
         """
@@ -172,21 +166,78 @@ class HBNBCommand(cmd.Cmd):
         """
         pass
 
+    def __parseline_generator(self, line):
+        """
+        It parse the commands but as a generator that's mean that
+        you need to use the next() to get the next value of the list.
+        Also, you know that the generator has no more elements when the
+        StopIterator exception is raised.
+
+        Args:
+            line (string): given line of the command with the args
+        Return
+            args (generator) splited by black spaces
+        """
+        split = line.split()
+        for i in split:
+            yield i
+
+    def data_converter(self, value):
+        """
+        This method tries to convert a given value to an
+        int or float
+
+        Args:
+            value (string): string value could contains a number
+        Return:
+            value variable as an (int), (float) or (string) if the previous
+            convertions fails
+        """
+        # try to convert to int:
+        try:
+            value = int(value)
+        except Exception:
+            pass
+        # try to convert to float:
+        try:
+            value = float(value)
+        except Exception:
+            pass
+        return value
+
+    def __check_args(self, cmd, err_message=""):
+        """
+        This method checkout if it is posible to get an argument
+        of the given cmd generator list
+
+        Args:
+            cmd (generator): Is a generator list with the arguments
+            err_message (str): Is the error message in case that there
+                                were a problem getting the next argument
+        Return:
+            argument (str) if it was possible to get an argument of the cmd
+            None if it wasn't possible
+        """
+        try:
+            return next(cmd)
+        except StopIteration:
+            if err_message:
+                print(err_message)
+            return None
+
     def postloop(self):
         print("", end="")
 
     def emptyline(self):
         pass
 
-    def __parseline_generator(self, line):
-        """It parse the commands but as a generator"""
-        split = line.split()
-        for i in split:
-            yield i
 
-    def __parseline(self, line):
-        """It parse the commands an return as a list"""
-        return line.split()
+    def precmd(self, line):
+        if line:
+            self.__cmd = self.__parseline_generator(line)
+            next(self.__cmd)
+        return cmd.Cmd.precmd(self, line)
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
