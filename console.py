@@ -5,7 +5,7 @@
 import cmd
 import sys
 from models.base_model import BaseModel
-import models
+from models import storage
 
 
 class HBNBCommand(cmd.Cmd):
@@ -43,7 +43,7 @@ class HBNBCommand(cmd.Cmd):
             className = next(cmd)
             if className in self.__classes:
                 instance = self.__classes[className]()
-                models.storage.save()
+                storage.save()
                 print(instance.id)
             else:
                 print("** class doesn't exist **")
@@ -78,7 +78,7 @@ class HBNBCommand(cmd.Cmd):
             print('** instance id missing **')
             return
 
-        objects = models.storage.all()
+        objects = storage.all()
         key = "{}.{}".format(class_name, id)
         if key in objects:
             instance = self.__classes[class_name](**objects[key])
@@ -99,7 +99,30 @@ class HBNBCommand(cmd.Cmd):
             $ destroy <Class name> <id>
             ex: $ destroy BaseModel 1234-1234-1234
         """
-        pass
+        cmd = self.__parseline_generator(arg)
+        try:
+            class_name = next(cmd)
+            if class_name not in self.__classes:
+                print("** class doesn't exist **")
+                return
+        except StopIteration:
+            print('** class name missing **')
+            return
+
+        try:
+            id = next(cmd)
+        except StopIteration:
+            print('** instance id missing **')
+            return
+
+        objects = storage.all()
+        key = "{}.{}".format(class_name, id)
+        if key in objects:
+            del objects[key]
+            storage.save()
+        else:
+            print('** no instance found **')
+            return
 
     def do_all(self, arg):
         """
@@ -118,11 +141,11 @@ class HBNBCommand(cmd.Cmd):
             cmd = self.__parseline_generator(arg)
             class_name = next(cmd)
             if class_name in self.__classes:
-                print(models.storage.list_instances_by_classname(class_name))
+                print(storage.list_instances_by_classname(class_name))
             else:
                 print("** class doesn't exist **")
         except StopIteration:
-            list_values = [v for v in models.storage.all().values()]
+            list_values = [v for v in storage.all().values()]
             list_instance = []
             for dicts in list_values:
                 class_name = dicts['__class__']
@@ -164,7 +187,6 @@ class HBNBCommand(cmd.Cmd):
     def __parseline(self, line):
         """It parse the commands an return as a list"""
         return line.split()
-
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
