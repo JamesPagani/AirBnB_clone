@@ -43,7 +43,9 @@ class HBNBCommand(cmd.Cmd):
             self.__cmd,
             "** class name missing **")
 
-        if className and className in self.__classes:
+        if not className:
+            pass
+        elif className in self.__classes:
             instance = self.__classes[className]()
             storage.save()
             print(instance.id)
@@ -133,19 +135,18 @@ class HBNBCommand(cmd.Cmd):
         """
         # Handle class_name argument:
         class_name = self.__check_args(self.__cmd, None)
-        if not class_name:
-            list_values = [v for v in storage.all().values()]
-            list_instance = []
-            for dicts in list_values:
-                class_name = dicts['__class__']
-                instance_str = self.__classes[class_name](**dicts).__str__()
-                list_instance.append(instance_str)
-            print(list_instance)
-        elif class_name in self.__classes:
-            print(storage.list_by_class(
-                class_name, self.__classes[class_name]))
+        if class_name and class_name not in self.__classes:
+            print("** class doesn't exist **")
         else:
-            print("")
+            str_list = []
+            for dictionary in storage.all().values():
+                class_v = self.__classes[dictionary['__class__']]
+                instance = class_v(**dictionary)
+                if class_name and instance.__class__.__name__ == class_name:
+                    str_list.append(instance.__str__())
+                elif not class_name:
+                    str_list.append(instance.__str__())
+            print(str_list)
 
     def do_update(self, arg):
         """
@@ -164,7 +165,50 @@ class HBNBCommand(cmd.Cmd):
         Notes:
             *Only one attribute can be updated at the time
         """
-        pass
+        # Handle class_name argument:
+        class_name = self.__check_args(self.__cmd, "** class name missing **")
+        if not class_name:
+            return
+        elif class_name not in self.__classes:
+            print("** class doesn't exist **")
+            return
+
+        # Handle id argument:
+        id = self.__check_args(self.__cmd, "** instance id missing **")
+        if not id:
+            return
+
+        # Handle <class_name>.<id> key existence:
+        key = "{}.{}".format(class_name, id)
+        objects = storage.all()
+        if key not in objects:
+            print("** no instance found **")
+            return
+
+        # Handle attr_k argument:
+        attr_k = self.__check_args(self.__cmd, "** attribute name missing **")
+        if not attr_k:
+            return
+
+        # Handle attr_v argument:
+        attr_v = self.__check_args(self.__cmd, "** value missing **")
+        if not attr_v:
+            return
+
+        # Updating instance:
+        forbbiden_attr = ["id", "created_at", "updated_at"]
+        dictionary = objects[key]
+
+        if attr_k not in forbbiden_attr:
+            try:
+                type_v = type(dictionary[attr_k])
+                dictionary[attr_k] = type_v(attr_v)
+            except Exception:
+                dictionary[attr_k] = attr_v
+
+            instance = self.__classes[class_name](**dictionary)
+            storage.new(instance)
+            storage.save()
 
     def __parseline_generator(self, line):
         """
@@ -182,7 +226,7 @@ class HBNBCommand(cmd.Cmd):
         for i in split:
             yield i
 
-    def data_converter(self, value):
+    def __data_converter(self, value):
         """
         This method tries to convert a given value to an
         int or float
@@ -195,15 +239,15 @@ class HBNBCommand(cmd.Cmd):
         """
         # try to convert to int:
         try:
-            value = int(value)
+            return int(value)
         except Exception:
             pass
         # try to convert to float:
         try:
-            value = float(value)
+            return float(value)
         except Exception:
             pass
-        return value
+        return str(value)
 
     def __check_args(self, cmd, err_message=""):
         """
@@ -230,7 +274,6 @@ class HBNBCommand(cmd.Cmd):
 
     def emptyline(self):
         pass
-
 
     def precmd(self, line):
         if line:
