@@ -218,6 +218,8 @@ class HBNBCommand(cmd.Cmd):
                 setattr(instance, attr_k, type_v(attr_v))
             except Exception:
                 setattr(instance, attr_k, self.__data_converter(attr_v))
+            finally:
+                instance.save()
             storage.save()
 
     def __parseline_generator(self, line):
