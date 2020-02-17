@@ -5,6 +5,7 @@
 import cmd
 import sys
 from models.base_model import BaseModel
+from models.user import User
 from models import storage
 
 
@@ -15,7 +16,8 @@ class HBNBCommand(cmd.Cmd):
     def __init__(self):
         super().__init__()
         self.__classes = {
-            'BaseModel': BaseModel
+            'BaseModel': BaseModel,
+            'User': User
             }
         self.__cmd = ""
 
