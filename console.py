@@ -4,8 +4,13 @@
 """This module contains the console application of the AirBnB web"""
 import cmd
 import sys
+from models.amenity import Amenity
 from models.base_model import BaseModel
+from models.city import City
 from models.user import User
+from models.place import Place
+from models.review import Review
+from models.state import State
 from models import storage
 
 
@@ -17,7 +22,11 @@ class HBNBCommand(cmd.Cmd):
         super().__init__()
         self.__classes = {
             'BaseModel': BaseModel,
-            'User': User
+            'User': User,
+            'State': State,
+            'Amenity': Amenity,
+            'Place': Place,
+            'Review': Review
             }
         self.__cmd = ""
 
