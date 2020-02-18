@@ -18,19 +18,17 @@ class HBNBCommand(cmd.Cmd):
     """This is the console class"""
     prompt = '(hbnb) '
 
-    def __init__(self):
-        "Init method"
-        super().__init__()
-        self.__classes = {
-            'BaseModel': BaseModel,
-            'User': User,
-            'State': State,
-            'City': City,
-            'Amenity': Amenity,
-            'Place': Place,
-            'Review': Review
-            }
-        self.__cmd = ""
+    __classes = {
+        'BaseModel': BaseModel,
+        'User': User,
+        'State': State,
+        'City': City,
+        'Amenity': Amenity,
+        'Place': Place,
+        'Review': Review
+    }
+
+    __cmd = ""
 
     def do_EOF(self, line):
         'exit the program'
@@ -54,13 +52,13 @@ class HBNBCommand(cmd.Cmd):
             ex: $ create BaseModel
         """
         className = self.__check_args(
-            self.__cmd,
+            HBNBCommand.__cmd,
             "** class name missing **")
 
         if not className:
             pass
-        elif className in self.__classes:
-            instance = self.__classes[className]()
+        elif className in HBNBCommand.__classes:
+            instance = HBNBCommand.__classes[className]()
             storage.save()
             print(instance.id)
         else:
@@ -79,15 +77,16 @@ class HBNBCommand(cmd.Cmd):
             ex: $ show BaseModel 1234-1234-1234
         """
         # Handle class_name argument:
-        class_name = self.__check_args(self.__cmd, "** class name missing **")
+        class_name = self.__check_args(
+            HBNBCommand.__cmd, "** class name missing **")
         if not class_name:
             return
-        if class_name and class_name not in self.__classes:
+        if class_name and class_name not in HBNBCommand.__classes:
             print("** class doesn't exist **")
             return
 
         # Handel id argument:
-        id = self.__check_args(self.__cmd, "** instance id missing **")
+        id = self.__check_args(HBNBCommand.__cmd, "** instance id missing **")
         if not id:
             return
 
@@ -113,15 +112,16 @@ class HBNBCommand(cmd.Cmd):
             ex: $ destroy BaseModel 1234-1234-1234
         """
         # Handle class_name argument:
-        class_name = self.__check_args(self.__cmd, "** class name missing **")
+        class_name = self.__check_args(
+            HBNBCommand.__cmd, "** class name missing **")
         if not class_name:
             return
-        if class_name not in self.__classes:
+        if class_name not in HBNBCommand.__classes:
             print("** class doesn't exist **")
             return
 
         # Handle id argument:
-        id = self.__check_args(self.__cmd, "** instance id missing **")
+        id = self.__check_args(HBNBCommand.__cmd, "** instance id missing **")
         if not id:
             return
 
@@ -148,8 +148,8 @@ class HBNBCommand(cmd.Cmd):
             $ all
         """
         # Handle class_name argument:
-        class_name = self.__check_args(self.__cmd, None)
-        if class_name and class_name not in self.__classes:
+        class_name = self.__check_args(HBNBCommand.__cmd, None)
+        if class_name and class_name not in HBNBCommand.__classes:
             print("** class doesn't exist **")
         else:
             str_list = []
@@ -178,15 +178,16 @@ class HBNBCommand(cmd.Cmd):
             *Only one attribute can be updated at the time
         """
         # Handle class_name argument:
-        class_name = self.__check_args(self.__cmd, "** class name missing **")
+        class_name = self.__check_args(
+            HBNBCommand.__cmd, "** class name missing **")
         if not class_name:
             return
-        elif class_name not in self.__classes:
+        elif class_name not in HBNBCommand.__classes:
             print("** class doesn't exist **")
             return
 
         # Handle id argument:
-        id = self.__check_args(self.__cmd, "** instance id missing **")
+        id = self.__check_args(HBNBCommand.__cmd, "** instance id missing **")
         if not id:
             return
 
@@ -198,12 +199,13 @@ class HBNBCommand(cmd.Cmd):
             return
 
         # Handle attr_k argument:
-        attr_k = self.__check_args(self.__cmd, "** attribute name missing **")
+        attr_k = self.__check_args(
+            HBNBCommand.__cmd, "** attribute name missing **")
         if not attr_k:
             return
 
         # Handle attr_v argument:
-        attr_v = self.__check_args(self.__cmd, "** value missing **")
+        attr_v = self.__check_args(HBNBCommand.__cmd, "** value missing **")
         if not attr_v:
             return
         if "\"" in attr_v:
