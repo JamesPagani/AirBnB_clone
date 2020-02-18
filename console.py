@@ -325,8 +325,8 @@ class HBNBCommand(cmd.Cmd):
     def precmd(self, line):
         "do before command"
         if line:
-            self.__cmd = self.__parseline_generator(line)
-            next(self.__cmd).split(".")
+            HBNBCommand.__cmd = self.__parseline_generator(line)
+            next(HBNBCommand.__cmd)
         return cmd.Cmd.precmd(self, line)
 
 
