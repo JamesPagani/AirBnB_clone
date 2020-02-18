@@ -300,8 +300,7 @@ class HBNBCommand(cmd.Cmd):
             Also, it returns None if the string has no end quote and print
             the error
         """
-        if ("\"" in attr[0]
-                and "\"" in attr[len(attr) - 1]):
+        if ("\"" in attr[0] and "\"" in attr[len(attr) - 1]):
             return attr[1:-1]
         quote_list = []
         while attr:
@@ -328,8 +327,6 @@ class HBNBCommand(cmd.Cmd):
             HBNBCommand.__cmd = self.__parseline_generator(line)
             next(HBNBCommand.__cmd)
         return cmd.Cmd.precmd(self, line)
-
-
 
 
 if __name__ == '__main__':
