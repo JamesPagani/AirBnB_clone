@@ -324,8 +324,55 @@ class HBNBCommand(cmd.Cmd):
     def precmd(self, line):
         if line:
             self.__cmd = self.__parseline_generator(line)
-            next(self.__cmd)
+            class_command = next(self.__cmd).split(".")
+            if class_command[0] in self.__classes:
+                print("yes. it starts with class_name")
         return cmd.Cmd.precmd(self, line)
+
+    def complete_create(self, text, line, begidx, endidx):
+        if not text:
+            return list(self.__classes.keys())
+        else:
+            return [
+                f for f in self.__classes.keys()
+                if f.startswith(text)
+                ]
+
+    def complete_all(self, text, line, begidx, endidx):
+        if not text:
+            return list(self.__classes.keys())
+        else:
+            return [
+                f for f in self.__classes.keys()
+                if f.startswith(text)
+                ]
+
+    def complete_destroy(self, text, line, begidx, endidx):
+        if not text:
+            return list(self.__classes.keys())
+        else:
+            return [
+                f for f in self.__classes.keys()
+                if f.startswith(text)
+                ]
+
+    def complete_show(self, text, line, begidx, endidx):
+        if not text:
+            return list(self.__classes.keys())
+        else:
+            return [
+                f for f in self.__classes.keys()
+                if f.startswith(text)
+                ]
+
+    def complete_update(self, text, line, begidx, endidx):
+        if not text:
+            return list(self.__classes.keys())
+        else:
+            return [
+                f for f in self.__classes.keys()
+                if f.startswith(text)
+                ]
 
 
 if __name__ == '__main__':
