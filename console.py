@@ -3,7 +3,7 @@
 # console.py
 """This module contains the console application of the AirBnB web"""
 import cmd
-import sys
+
 from models.amenity import Amenity
 from models.base_model import BaseModel
 from models.city import City
