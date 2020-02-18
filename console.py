@@ -19,6 +19,7 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def __init__(self):
+        "Init method"
         super().__init__()
         self.__classes = {
             'BaseModel': BaseModel,
@@ -316,20 +317,22 @@ class HBNBCommand(cmd.Cmd):
             return None
 
     def postloop(self):
+        "do after the principal loop"
         print("", end="")
 
     def emptyline(self):
+        "do nothign when press start"
         pass
 
     def precmd(self, line):
+        "do before command"
         if line:
             self.__cmd = self.__parseline_generator(line)
-            class_command = next(self.__cmd).split(".")
-            if class_command[0] in self.__classes:
-                print("yes. it starts with class_name")
+            next(self.__cmd).split(".")
         return cmd.Cmd.precmd(self, line)
 
     def complete_create(self, text, line, begidx, endidx):
+        "autocomplete classes"
         if not text:
             return list(self.__classes.keys())
         else:
@@ -339,6 +342,7 @@ class HBNBCommand(cmd.Cmd):
                 ]
 
     def complete_all(self, text, line, begidx, endidx):
+        "autocomplete classes"
         if not text:
             return list(self.__classes.keys())
         else:
@@ -348,6 +352,7 @@ class HBNBCommand(cmd.Cmd):
                 ]
 
     def complete_destroy(self, text, line, begidx, endidx):
+        "autocomplete classes"
         if not text:
             return list(self.__classes.keys())
         else:
@@ -357,6 +362,7 @@ class HBNBCommand(cmd.Cmd):
                 ]
 
     def complete_show(self, text, line, begidx, endidx):
+        "autocomplete classes"
         if not text:
             return list(self.__classes.keys())
         else:
@@ -366,6 +372,7 @@ class HBNBCommand(cmd.Cmd):
                 ]
 
     def complete_update(self, text, line, begidx, endidx):
+        "autocomplete classes"
         if not text:
             return list(self.__classes.keys())
         else:
