@@ -31,7 +31,7 @@ class HBNBCommand(cmd.Cmd):
     __cmd = ""
 
     def do_EOF(self, line):
-        'exit the program'
+        'Quit command to exit the program'
         print()
         return True
 
@@ -318,10 +318,6 @@ class HBNBCommand(cmd.Cmd):
             print("** value Error: No closing quotation **")
             return None
 
-    def postloop(self):
-        "do after the principal loop"
-        print("", end="")
-
     def emptyline(self):
         "do nothign when press start"
         pass
@@ -333,55 +329,7 @@ class HBNBCommand(cmd.Cmd):
             next(self.__cmd).split(".")
         return cmd.Cmd.precmd(self, line)
 
-    def complete_create(self, text, line, begidx, endidx):
-        "autocomplete classes"
-        if not text:
-            return list(self.__classes.keys())
-        else:
-            return [
-                f for f in self.__classes.keys()
-                if f.startswith(text)
-                ]
 
-    def complete_all(self, text, line, begidx, endidx):
-        "autocomplete classes"
-        if not text:
-            return list(self.__classes.keys())
-        else:
-            return [
-                f for f in self.__classes.keys()
-                if f.startswith(text)
-                ]
-
-    def complete_destroy(self, text, line, begidx, endidx):
-        "autocomplete classes"
-        if not text:
-            return list(self.__classes.keys())
-        else:
-            return [
-                f for f in self.__classes.keys()
-                if f.startswith(text)
-                ]
-
-    def complete_show(self, text, line, begidx, endidx):
-        "autocomplete classes"
-        if not text:
-            return list(self.__classes.keys())
-        else:
-            return [
-                f for f in self.__classes.keys()
-                if f.startswith(text)
-                ]
-
-    def complete_update(self, text, line, begidx, endidx):
-        "autocomplete classes"
-        if not text:
-            return list(self.__classes.keys())
-        else:
-            return [
-                f for f in self.__classes.keys()
-                if f.startswith(text)
-                ]
 
 
 if __name__ == '__main__':
