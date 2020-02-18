@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # Author: Jhonatan Arenas (Cybernuki) <1164@holbertonschool.com>
 # console.py
 """This module contains the console application of the AirBnB web"""
