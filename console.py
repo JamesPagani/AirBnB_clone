@@ -227,6 +227,17 @@ class HBNBCommand(cmd.Cmd):
                 instance.save()
             storage.save()
 
+    def do_count(self, line):
+        """counts how many instances of a class exists"""
+        class_name = self.__check_args(
+            HBNBCommand.__cmd, "** class name missing **")
+        if not class_name:
+            return
+        elif class_name not in HBNBCommand.__classes:
+            print("** class doesn't exist **")
+            return
+        print(HBNBCommand.__classes[class_name].count())
+
     def __parseline_generator(self, line):
         """
         It parse the commands but as a generator that's mean that
@@ -336,7 +347,6 @@ class HBNBCommand(cmd.Cmd):
                     i = 2
                 class_command[2] = " ".join(class_command[2].split(","))
                 line = " ".join(class_command)
-                print(line)
             HBNBCommand.__cmd = self.__parseline_generator(line)
             next(HBNBCommand.__cmd)
         return cmd.Cmd.precmd(self, line)
