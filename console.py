@@ -330,7 +330,7 @@ class HBNBCommand(cmd.Cmd):
 
     def emptyline(self):
         "do nothign when press start"
-        pass
+        return ""
 
     def precmd(self, line):
         "do before command"
