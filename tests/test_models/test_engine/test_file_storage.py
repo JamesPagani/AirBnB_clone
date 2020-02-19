@@ -46,5 +46,6 @@ class TestFileStorage(unittest.TestCase):
         except AttributeError:
             self.fail("")
 
+
 if __name__ == '__main__':
     unittest.main()
