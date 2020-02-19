@@ -334,7 +334,9 @@ class HBNBCommand(cmd.Cmd):
                     split_l = split_l[1].split(split_char)
                     class_command[i] = split_l[0]
                     i = 2
-                line = " ".join(class_command)   
+                class_command[2] = " ".join(class_command[2].split(","))
+                line = " ".join(class_command)
+                print(line)
             HBNBCommand.__cmd = self.__parseline_generator(line)
             next(HBNBCommand.__cmd)
         return cmd.Cmd.precmd(self, line)
