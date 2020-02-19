@@ -15,6 +15,8 @@ import models
 class BaseModel:
     """Template for all other classes."""
 
+    __instances = 0
+
     def __init__(self, *args, **kwargs):
         """Initialize a new class object."""
         if kwargs:
@@ -33,6 +35,7 @@ class BaseModel:
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
             models.storage.new(self)
+        type(self).__instances += 1
 
     def __str__(self):
         """String representation of the object."""
@@ -51,3 +54,7 @@ class BaseModel:
         new_dict["created_at"] = self.created_at.isoformat()
         new_dict["updated_at"] = self.updated_at.isoformat()
         return new_dict
+
+    @classmethod
+    def count(cls):
+        return cls.__instances
