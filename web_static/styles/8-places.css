@@ -10,3 +10,33 @@
     display: inline-block;
     text-align: center;
 }
+.price_by_night{
+    border-style: solid;
+    border-color: #FF5A5F;
+    border-width: 4px;
+    border-radius: 50%;
+    min-width: 60px;
+    height: 60px;
+    float: right;
+}
+.price_by_night p{
+    margin: 15px 0px;
+    color: #FF5A5F;
+    font-size: 30px;
+    line-height: 100%;
+}
+.information{
+    height: 80px;
+    border-top-style: solid;
+    border-top-color: #DDDDDD;
+    border-top-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #DDDDDD;
+    border-bottom-width: 1px;
+}
+.information div{
+    width: 100px;
+}
+.max_guest{
+    background-color: black;
+}
