@@ -7,4 +7,6 @@
     margin: 20px;
     border: solid #FF5A5F 1px;
     border-radius: 4px;
+    display: inline-block;
+    text-align: center;
 }
